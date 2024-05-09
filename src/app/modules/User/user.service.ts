@@ -6,8 +6,14 @@ const createUserIntoDB = async (payload: TUser) => {
   return user;
 };
 
+const createAdminAndManagerIntoDB = async (payload: TUser) => {
+  const user = await User.create(payload);
+  return user;
+};
+
 const UserServices = {
   createUserIntoDB,
+  createAdminAndManagerIntoDB,
 };
 
 export default UserServices;

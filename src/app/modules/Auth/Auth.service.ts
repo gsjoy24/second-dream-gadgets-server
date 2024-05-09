@@ -4,18 +4,18 @@ import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../errors/AppError';
+import { TUser } from '../User/user.interface';
 import User from '../User/user.model';
 import { TLoginUser } from './Auth.interface';
 
 const loginUser = async (payload: TLoginUser) => {
   // check if the user exists
   const isUserExits = await User.isUserExists(payload.email);
+  const user = await User.findOne({ email: payload.email });
 
   if (!isUserExits) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-
-  const user = await User.findOne({ email: payload.email });
 
   // check for password match
   const isPasswordMatched = await User.isPasswordMatched(

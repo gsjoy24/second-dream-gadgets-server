@@ -1,6 +1,7 @@
 import express from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 
+import authGuard from '../../middlewares/authGuard';
 import UserControllers from './user.controller';
 import UserValidations from './user.validation';
 
@@ -10,6 +11,13 @@ router.post(
   '/create-user',
   validateRequest(UserValidations.UserValidationSchema),
   UserControllers.createUser,
+);
+
+router.post(
+  '/create-admin-or-manager',
+  authGuard('admin'),
+  validateRequest(UserValidations.adminAndManagerValidationSchema),
+  UserControllers.createAdminAndManager,
 );
 
 export const UserRoutes = router;

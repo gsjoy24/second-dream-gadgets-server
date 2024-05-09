@@ -6,10 +6,10 @@ const notFound = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   next: NextFunction,
 ) => {
-  return res.status(httpStatus.NOT_FOUND).json({
+  return res.status(httpStatus.BAD_REQUEST).json({
     success: false,
-    status: httpStatus.NOT_FOUND,
-    message: 'Not Found!',
+    statusCode: httpStatus.BAD_REQUEST,
+    message: 'Api not found. Please check the url and try again.',
   });
 };
 
