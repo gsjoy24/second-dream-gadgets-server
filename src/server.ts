@@ -3,6 +3,7 @@ import { Server } from 'http';
 import mongoose from 'mongoose';
 import app from './app';
 import config from './app/config';
+import seedSuperAdmin from './app/seed';
 
 let server: Server;
 async function main() {
@@ -11,6 +12,7 @@ async function main() {
     server = app.listen(config.port, () => {
       console.log(`the server is running on ${config.port}`);
     });
+    await seedSuperAdmin();
   } catch (error) {
     console.log(error);
   }

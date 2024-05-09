@@ -1,12 +1,18 @@
 /* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
+export type UserRoles = {
+  ADMIN: 'admin';
+  MANAGER: 'manager';
+  USER: 'user';
+};
+
 export type TUser = {
   _id: string;
   name: string;
   email: string;
   password: string;
-  role: string;
+  role: UserRoles;
 };
 
 export type TLoginUser = {
