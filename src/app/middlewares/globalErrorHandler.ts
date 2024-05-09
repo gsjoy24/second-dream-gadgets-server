@@ -1,6 +1,7 @@
 import { ErrorRequestHandler, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import AppError from '../errors/AppError';
+import { duplicateError } from '../errors/duplicateEror';
 import { handleCastError } from '../errors/handleCastError';
 import handleValidationError from '../errors/handleValidationError';
 import { handleZodError } from '../errors/handleZodError';
@@ -26,6 +27,8 @@ const globalErrorHandler: ErrorRequestHandler = (
     simplifyError = handleCastError(err);
   } else if (err.statusCode === 401) {
     simplifyError = unauthorizedError(err);
+  } else if (err.code === 11000) {
+    simplifyError = duplicateError(err);
   }
 
   statusCode = simplifyError?.statusCode;

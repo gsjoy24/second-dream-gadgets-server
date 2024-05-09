@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import config from '../config';
-import { User } from '../modules/Auth/Auth.model';
+import User from '../modules/User/user.model';
 
 const seedSuperAdmin = async () => {
   const password = await bcrypt.hash(

@@ -3,7 +3,8 @@ import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import AppError from '../errors/AppError';
-import { User } from '../modules/Auth/Auth.model';
+
+import User from '../modules/User/user.model';
 import catchAsync from '../utils/catchAsync';
 
 const authGuard = (...requiredRoles: string[]) => {
