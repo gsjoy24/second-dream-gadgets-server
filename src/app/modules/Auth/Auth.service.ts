@@ -4,13 +4,8 @@ import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../errors/AppError';
-import { TLoginUser, TUser } from './Auth.interface';
+import { TLoginUser } from './Auth.interface';
 import { User } from './Auth.model';
-
-const createUserIntoDB = async (payload: TUser) => {
-  const user = await User.create(payload);
-  return user;
-};
 
 const loginUser = async (payload: TLoginUser) => {
   // check if the user exists
@@ -49,7 +44,6 @@ const loginUser = async (payload: TLoginUser) => {
   return { user, token };
 };
 
-export const UserServices = {
-  createUserIntoDB,
+export const AuthServices = {
   loginUser,
 };

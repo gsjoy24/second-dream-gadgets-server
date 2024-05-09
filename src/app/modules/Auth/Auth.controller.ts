@@ -1,22 +1,11 @@
+import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-import { UserServices } from './Auth.service';
-import { Request, Response } from 'express';
-
-const createUser = catchAsync(async (req: Request, res: Response) => {
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const user = await UserServices.createUserIntoDB(req.body);
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'User registered successfully',
-    data: user,
-  });
-});
+import { AuthServices } from './Auth.service';
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.loginUser(req.body);
+  const result = await AuthServices.loginUser(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -25,7 +14,8 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const UserControllers = {
-  createUser,
+const AuthControllers = {
   loginUser,
 };
+
+export default AuthControllers;
