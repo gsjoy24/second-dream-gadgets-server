@@ -6,6 +6,16 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import CartServices from './cart.service';
 
+const getCart = catchAsync(async (req: Request, res: Response) => {
+  const cart = await CartServices.getCart(req.user as JwtPayload);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cart retrieved successfully',
+    data: cart,
+  });
+});
+
 const addProductToCart = catchAsync(async (req: Request, res: Response) => {
   const result = await CartServices.addProductToCart(
     req.body,
@@ -52,6 +62,7 @@ const CartControllers = {
   addProductToCart,
   removeFromCart,
   manipulateProductQuantity,
+  getCart,
 };
 
 export default CartControllers;

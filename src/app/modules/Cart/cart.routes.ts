@@ -6,6 +6,8 @@ import CartValidations from './cart.validation';
 
 const router = express.Router();
 
+router.get('/my-cart', authGuard('user', 'manager'), CartControllers.getCart);
+
 router.post(
   '/add',
   authGuard('user', 'manager'),

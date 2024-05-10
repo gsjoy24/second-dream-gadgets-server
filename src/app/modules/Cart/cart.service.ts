@@ -6,6 +6,22 @@ import Product from '../Product/product.model';
 import { TCart } from '../User/user.interface';
 import User from '../User/user.model';
 
+const getCart = async (user: JwtPayload) => {
+  const cart = await User.findOne({ _id: user._id })
+    .select('cart')
+    .populate('cart.product', '_id product_name product_price quantity');
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const total_price = cart?.cart.reduce((acc: number, item: any) => {
+    return acc + item?.product?.product_price * item.quantity;
+  }, 0);
+
+  return {
+    total_price,
+    cart: cart?.cart,
+  };
+};
+
 const addProductToCart = async (cartData: TCart, user: JwtPayload) => {
   // check if the product is exists
   const isProductExist = await Product.findById(cartData.product);
@@ -82,6 +98,7 @@ const CartServices = {
   addProductToCart,
   removeFromCart,
   manipulateProductQuantity,
+  getCart,
 };
 
 export default CartServices;
