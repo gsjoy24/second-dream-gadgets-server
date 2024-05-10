@@ -1,7 +1,23 @@
 import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
-import { TUser, TUserModel } from './user.interface';
+import { TCart, TUser, TUserModel } from './user.interface';
+
+const CartSchema = new Schema<TCart>(
+  {
+    product: {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+    quantity: {
+      type: Number,
+      default: 1,
+    },
+  },
+  {
+    _id: false,
+  },
+);
 
 const UserSchema = new Schema<TUser, TUserModel>(
   {
@@ -25,18 +41,7 @@ const UserSchema = new Schema<TUser, TUserModel>(
       type: String,
       enum: ['user', 'admin', 'manager'],
     },
-    cart: [
-      {
-        productId: {
-          type: Schema.Types.ObjectId,
-          ref: 'Product',
-        },
-        quantity: {
-          type: Number,
-          default: 1,
-        },
-      },
-    ],
+    cart: [CartSchema],
   },
   {
     timestamps: true,

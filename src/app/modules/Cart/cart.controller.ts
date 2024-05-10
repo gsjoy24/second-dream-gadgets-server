@@ -18,8 +18,22 @@ const addProductToCart = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const removeFromCart = catchAsync(async (req: Request, res: Response) => {
+  const result = await CartServices.removeFromCart(
+    req.params.productId,
+    req.user as JwtPayload,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Product removed from cart successfully',
+    data: result,
+  });
+});
+
 const CartControllers = {
   addProductToCart,
+  removeFromCart,
 };
 
 export default CartControllers;

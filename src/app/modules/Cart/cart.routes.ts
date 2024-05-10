@@ -10,5 +10,11 @@ router.post(
   CartControllers.addProductToCart,
 );
 
+router.delete(
+  '/remove/:productId',
+  authGuard('user', 'admin', 'manager'),
+  CartControllers.removeFromCart,
+);
+
 const CartRoutes = router;
 export default CartRoutes;

@@ -8,7 +8,7 @@ export type UserRoles = {
 };
 
 export type TCart = {
-  productId: Types.ObjectId;
+  product: Types.ObjectId;
   quantity: number;
 };
 
