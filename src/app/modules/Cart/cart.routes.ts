@@ -19,5 +19,11 @@ router.delete(
   CartControllers.removeFromCart,
 );
 
+router.put(
+  '/:action/:productId',
+  authGuard('user', 'admin', 'manager'),
+  CartControllers.manipulateProductQuantity,
+);
+
 const CartRoutes = router;
 export default CartRoutes;

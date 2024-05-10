@@ -32,9 +32,26 @@ const removeFromCart = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const manipulateProductQuantity = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await CartServices.manipulateProductQuantity(
+      req.params.productId as unknown as Types.ObjectId,
+      req.params.action,
+      req.user as JwtPayload,
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: `Product quantity ${req.params.action}ed successfully`,
+      data: result,
+    });
+  },
+);
+
 const CartControllers = {
   addProductToCart,
   removeFromCart,
+  manipulateProductQuantity,
 };
 
 export default CartControllers;
