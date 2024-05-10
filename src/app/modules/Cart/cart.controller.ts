@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import CartServices from './cart.service';
@@ -20,7 +21,7 @@ const addProductToCart = catchAsync(async (req: Request, res: Response) => {
 
 const removeFromCart = catchAsync(async (req: Request, res: Response) => {
   const result = await CartServices.removeFromCart(
-    req.params.productId,
+    req.params.productId as unknown as Types.ObjectId,
     req.user as JwtPayload,
   );
   sendResponse(res, {

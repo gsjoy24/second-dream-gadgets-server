@@ -27,4 +27,5 @@ export interface TUserModel extends Model<TUser> {
     plainPassword: string,
     hashedPassword: string,
   ): Promise<boolean>;
+  isProductExistInCart: (productId: Types.ObjectId, userId: string) => void;
 }

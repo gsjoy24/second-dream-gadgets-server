@@ -8,7 +8,7 @@ const seedSuperAdmin = async () => {
     password: config.super_admin_password,
     role: 'admin',
   };
-  
+
   // check if the user exists
   const isUserExits = await User.isUserExists(adminData.email as string);
   if (!isUserExits) {

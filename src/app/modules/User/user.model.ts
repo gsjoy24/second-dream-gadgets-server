@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
-import { Schema, model } from 'mongoose';
+import httpStatus from 'http-status';
+import { Schema, Types, model } from 'mongoose';
 import config from '../../config';
+import AppError from '../../errors/AppError';
 import { TCart, TUser, TUserModel } from './user.interface';
 
 const CartSchema = new Schema<TCart>(
@@ -73,6 +75,26 @@ UserSchema.post('save', function (doc, next) {
 // method for finding user
 UserSchema.statics.isUserExists = async function (email: string) {
   return await this.findOne({ email }).select('+password');
+};
+
+UserSchema.statics.isProductExistInCart = async function (
+  productId: Types.ObjectId,
+  userId: string,
+) {
+  // find if the product is in the cart array. If it is not found, it will throw an error.
+  const item = await this.findOne({
+    _id: userId,
+    cart: {
+      $elemMatch: {
+        product: productId,
+      },
+    },
+  });
+
+  if (!item) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found in the cart');
+  }
+  return item;
 };
 
 // method for comparing password
