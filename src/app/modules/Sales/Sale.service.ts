@@ -30,7 +30,7 @@ const addSaleIntoDB = async (payload: TSale) => {
 
   // delete product if quantity is 0
   if (decrementQuantity.quantity === 0) {
-    await Product.findByIdAndUpdate(payload.product, { isDeleted: true });
+    await Product.findByIdAndDelete(payload.product);
   }
 
   const newSale = Sale.create(payload);

@@ -7,7 +7,6 @@ const excludeFields = [
   'maxPrice',
   'search',
   'createdAt',
-  'isDeleted',
 ];
 
 export default excludeFields;

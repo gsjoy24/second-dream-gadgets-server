@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import { JwtPayload } from 'jsonwebtoken';
 import { Model, Types } from 'mongoose';
 
 export type TProduct = {
@@ -21,9 +22,8 @@ export type TProduct = {
   warranty: number;
   weight: number;
   createdAt?: Date;
-  isDeleted?: boolean;
 };
 
 export interface TProductModel extends Model<TProduct> {
-  isProductExists(id: string): Promise<TProduct | null>;
+  isProductExists(id: string, user: JwtPayload): Promise<TProduct | null>;
 }

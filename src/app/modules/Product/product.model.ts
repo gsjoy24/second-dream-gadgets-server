@@ -1,4 +1,7 @@
+import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import { Schema, model } from 'mongoose';
+import AppError from '../../errors/AppError';
 import { TProduct, TProductModel } from './product.interface';
 
 const ProductSchema = new Schema<TProduct, TProductModel>(
@@ -83,16 +86,25 @@ const ProductSchema = new Schema<TProduct, TProductModel>(
     ram_capacity: {
       type: String,
     },
-
-    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
   },
 );
 
-ProductSchema.statics.isProductExists = async function (id: string) {
-  return await this.findById(id);
+ProductSchema.statics.isProductExists = async function (
+  id: string,
+  user: JwtPayload,
+) {
+  const queryData = { _id: id } as Record<string, unknown>;
+  if (user.role === 'user') {
+    queryData['user'] = user._id;
+  }
+  const product = await this.findOne(queryData);
+  if (!product) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+  return product;
 };
 
 const Product = model<TProduct, TProductModel>('Product', ProductSchema);

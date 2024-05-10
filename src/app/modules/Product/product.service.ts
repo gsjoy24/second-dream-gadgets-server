@@ -105,7 +105,6 @@ const getAllProductsFromDB = async (
 
   //filter by other fields
   const filteredProducts = Product.find({
-    isDeleted: query?.isDeleted || false,
     ...queryObject,
   })
     .find(filterByUser)
@@ -125,38 +124,42 @@ const getAllProductsFromDB = async (
   return { meta, allProducts };
 };
 
-const getProductByIdFromDB = async (id: string) => {
-  const product = await Product.isProductExists(id);
-
-  if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-  }
+const getProductByIdFromDB = async (id: string, user: JwtPayload) => {
+  const product = await Product.isProductExists(id, user);
   return product;
 };
 
-const deleteProductByIdFromDB = async (id: string) => {
-  const product = await Product.isProductExists(id);
-  if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-  }
+const deleteProductByIdFromDB = async (id: string, user: JwtPayload) => {
+  await Product.isProductExists(id, user);
 
-  const res = await Product.findByIdAndUpdate(id, { isDeleted: true });
+  const res = await Product.findByIdAndDelete(id);
   return res;
 };
 
-const deleteMultipleProductsFromDB = async (product_ids: string[]) => {
-  const products = await Product.updateMany(
-    { _id: { $in: product_ids } },
-    { isDeleted: true },
-  );
+const deleteMultipleProductsFromDB = async (
+  product_ids: string[],
+  user: JwtPayload,
+) => {
+  const queryData = { _id: { $in: product_ids } } as Record<string, unknown>;
+
+  if (user.role === 'user') {
+    queryData['user'] = user._id;
+  }
+
+  const products = await Product.deleteMany(queryData);
+  if (!products.deletedCount) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+  }
+
   return products;
 };
 
-const updateProductByIdFromDB = async (id: string, payload: TProduct) => {
-  const product = await Product.isProductExists(id);
-  if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-  }
+const updateProductByIdFromDB = async (
+  id: string,
+  payload: TProduct,
+  user: JwtPayload,
+) => {
+  await Product.isProductExists(id, user);
 
   const updatedProduct = await Product.findByIdAndUpdate(id, payload, {
     new: true,

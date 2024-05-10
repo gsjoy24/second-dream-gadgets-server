@@ -35,7 +35,10 @@ const getAllProducts = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getProductById = catchAsync(async (req: Request, res: Response) => {
-  const product = await ProductServices.getProductByIdFromDB(req.params.id);
+  const product = await ProductServices.getProductByIdFromDB(
+    req.params.id,
+    req.user as JwtPayload,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -46,7 +49,10 @@ const getProductById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteProductById = catchAsync(async (req: Request, res: Response) => {
-  await ProductServices.deleteProductByIdFromDB(req.params.id);
+  await ProductServices.deleteProductByIdFromDB(
+    req.params.id,
+    req.user as JwtPayload,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -59,7 +65,8 @@ const deleteProductById = catchAsync(async (req: Request, res: Response) => {
 const deleteMultipleProducts = catchAsync(
   async (req: Request, res: Response) => {
     const products = await ProductServices.deleteMultipleProductsFromDB(
-      req.body,
+      req.body.product_ids,
+      req.user as JwtPayload,
     );
 
     sendResponse(res, {
@@ -75,6 +82,7 @@ const updateProductById = catchAsync(async (req: Request, res: Response) => {
   const product = await ProductServices.updateProductByIdFromDB(
     req.params.id,
     req.body,
+    req.user as JwtPayload,
   );
 
   sendResponse(res, {
