@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-import SaleServices from './Sale.service';
+import SaleServices from './sale.service';
 
 const addSale = catchAsync(async (req: Request, res: Response) => {
   const sale = await SaleServices.addSaleIntoDB(req.body);

@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import Product from '../Product/product.model';
-import { TSale } from './Sale.interface';
-import Sale from './Sale.model';
+import { TSale } from './sale.interface';
+import Sale from './sale.model';
 
 const addSaleIntoDB = async (payload: TSale) => {
   const product = await Product.isProductExists(payload.product.toString());

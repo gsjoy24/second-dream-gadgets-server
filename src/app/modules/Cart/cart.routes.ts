@@ -8,20 +8,20 @@ const router = express.Router();
 
 router.post(
   '/add',
-  authGuard('user', 'admin', 'manager'),
+  authGuard('user', 'manager'),
   validateRequest(CartValidations.addToCart),
   CartControllers.addProductToCart,
 );
 
 router.delete(
   '/remove/:productId',
-  authGuard('user', 'admin', 'manager'),
+  authGuard('user', 'manager'),
   CartControllers.removeFromCart,
 );
 
 router.put(
   '/:action/:productId',
-  authGuard('user', 'admin', 'manager'),
+  authGuard('user', 'manager'),
   CartControllers.manipulateProductQuantity,
 );
 

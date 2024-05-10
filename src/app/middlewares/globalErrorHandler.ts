@@ -1,5 +1,6 @@
 import { ErrorRequestHandler, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import config from '../config';
 import AppError from '../errors/AppError';
 import { duplicateError } from '../errors/duplicateErorr';
 import { handleCastError } from '../errors/handleCastError';
@@ -45,7 +46,11 @@ const globalErrorHandler: ErrorRequestHandler = (
     message,
     errorMessage,
     errorDetails: err.statusCode === 401 ? null : err,
-    stack: err.statusCode === 401 ? null : err?.stack,
+    // if the error is 401 or the NODE_ENV is not development, we don't want to show the error stack.
+    stack:
+      config.NODE_ENV === 'development' && err.statusCode !== 401
+        ? err.stack
+        : null,
   });
 };
 

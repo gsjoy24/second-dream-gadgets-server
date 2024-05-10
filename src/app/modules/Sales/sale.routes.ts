@@ -1,8 +1,8 @@
 import express from 'express';
 import authGuard from '../../middlewares/authGuard';
 import validateRequest from '../../middlewares/validateRequest';
-import SaleControllers from './Sale.controller';
-import SaleValidations from './Sale.validation';
+import SaleControllers from './sale.controller';
+import SaleValidations from './sale.validation';
 
 const router = express.Router();
 

@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { AuthRoutes } from '../modules/Auth/Auth.route';
+import { AuthRoutes } from '../modules/Auth/auth.routes';
 import CartRoutes from '../modules/Cart/cart.routes';
-import { ProductRoutes } from '../modules/Product/product.route';
-import SaleRoutes from '../modules/Sales/Sale.route';
+import { ProductRoutes } from '../modules/Product/product.routes';
+import SaleRoutes from '../modules/Sales/sale.routes';
 import { UserRoutes } from '../modules/User/user.routes';
 
 const router = Router();

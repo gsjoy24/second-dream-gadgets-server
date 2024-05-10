@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TSale, TSaleModel } from './Sale.interface';
+import { TSale, TSaleModel } from './sale.interface';
 
 const SaleSchema = new Schema<TSale, TSaleModel>(
   {

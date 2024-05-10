@@ -6,7 +6,7 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 import { TUser } from '../User/user.interface';
 import User from '../User/user.model';
-import { TLoginUser } from './Auth.interface';
+import { TLoginUser } from './auth.interface';
 
 const loginUser = async (payload: TLoginUser) => {
   // check if the user exists
