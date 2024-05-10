@@ -1,10 +1,15 @@
 /* eslint-disable no-unused-vars */
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type UserRoles = {
   ADMIN: 'admin';
   MANAGER: 'manager';
   USER: 'user';
+};
+
+export type TCart = {
+  productId: Types.ObjectId;
+  quantity: number;
 };
 
 export type TUser = {
@@ -13,6 +18,7 @@ export type TUser = {
   email: string;
   password: string;
   role: UserRoles;
+  cart: TCart[];
 };
 
 export interface TUserModel extends Model<TUser> {

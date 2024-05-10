@@ -25,6 +25,18 @@ const UserSchema = new Schema<TUser, TUserModel>(
       type: String,
       enum: ['user', 'admin', 'manager'],
     },
+    cart: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Product',
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
