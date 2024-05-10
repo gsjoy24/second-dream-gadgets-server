@@ -3,6 +3,10 @@ import { TProduct, TProductModel } from './product.interface';
 
 const ProductSchema = new Schema<TProduct, TProductModel>(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
     product_name: {
       type: String,
       required: [true, 'Name is required'],

@@ -1,15 +1,19 @@
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../errors/AppError';
 import excludeFields from './product.constant';
 import { TProduct } from './product.interface';
 import Product from './product.model';
 
-const addProductIntoDB = async (payload: TProduct) => {
-  const product = await Product.create(payload);
-  return product;
+const addProductIntoDB = async (payload: TProduct, user: JwtPayload) => {
+  const result = await Product.create({ ...payload, user: user._id });
+  return result;
 };
 
-const getAllProductsFromDB = async (query: Record<string, unknown>) => {
+const getAllProductsFromDB = async (
+  query: Record<string, unknown>,
+  user: JwtPayload,
+) => {
   const page = Number(query?.page) || 1;
   const limit = Number(query?.limit) || 10;
   const skip = (page - 1) * limit;
@@ -17,6 +21,8 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
   const releasePeriod = query?.releasePeriod || 'all';
 
   // I took help of ChatGpt to implement filtering with the date. I was facing some issues with the date filtering. ChatGpt helped me to solve the issue.
+  const filterByUser = user.role === 'user' ? { user: user._id } : {};
+
   let startDate = new Date();
   switch ((releasePeriod as string).toLowerCase()) {
     case 'daily':
@@ -102,6 +108,7 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
     isDeleted: query?.isDeleted || false,
     ...queryObject,
   })
+    .find(filterByUser)
     .find(searchWithName)
     .find(createdAtFilter)
     .find(minMaxPrice);

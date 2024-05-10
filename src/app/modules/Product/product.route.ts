@@ -7,27 +7,39 @@ const router = express.Router();
 
 router.post(
   '/',
-  authGuard('admin'),
+  authGuard('admin', 'user', 'manager'),
   validateRequest(ProductValidations.productValidationSchema),
   ProductControllers.addProduct,
 );
 
-router.get('/', authGuard('admin'), ProductControllers.getAllProducts);
+router.get(
+  '/',
+  authGuard('admin', 'user', 'manager'),
+  ProductControllers.getAllProducts,
+);
 
-router.get('/:id', authGuard('admin'), ProductControllers.getProductById);
+router.get(
+  '/:id',
+  authGuard('admin', 'user', 'manager'),
+  ProductControllers.getProductById,
+);
 
-router.delete('/:id', authGuard('admin'), ProductControllers.deleteProductById);
+router.delete(
+  '/:id',
+  authGuard('admin', 'user', 'manager'),
+  ProductControllers.deleteProductById,
+);
 
 router.put(
   '/:id',
-  authGuard('admin'),
+  authGuard('admin', 'user', 'manager'),
   validateRequest(ProductValidations.updateProductValidationSchema),
   ProductControllers.updateProductById,
 );
 
 router.post(
   '/delete-multiple-products',
-  authGuard('admin'),
+  authGuard('admin', 'user', 'manager'),
   ProductControllers.deleteMultipleProducts,
 );
 

@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import ProductServices from './product.service';
 
 const addProduct = catchAsync(async (req: Request, res: Response) => {
-  const product = await ProductServices.addProductIntoDB(req.body);
+  const product = await ProductServices.addProductIntoDB(
+    req.body,
+    req.user as JwtPayload,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -18,6 +22,7 @@ const addProduct = catchAsync(async (req: Request, res: Response) => {
 const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   const { meta, allProducts } = await ProductServices.getAllProductsFromDB(
     req.query,
+    req.user as JwtPayload,
   );
 
   sendResponse(res, {
