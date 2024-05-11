@@ -57,6 +57,10 @@ const SaleSchema = new Schema<TSale, TSaleModel>(
   },
 );
 
+SaleSchema.statics.isSaleExists = async function (id: string) {
+  return this.findById(id);
+};
+
 const Sale = model<TSale, TSaleModel>('Sale', SaleSchema);
 
 export default Sale;

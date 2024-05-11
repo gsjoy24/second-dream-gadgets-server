@@ -42,17 +42,6 @@ const getSaleById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateSaleById = catchAsync(async (req: Request, res: Response) => {
-  const sale = await SaleServices.updateSaleIntoDB(req.params.id, req.body);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Sale updated successfully',
-    data: sale,
-  });
-});
-
 const deleteSaleById = catchAsync(async (req: Request, res: Response) => {
   await SaleServices.deleteSaleFromDB(req.params.id);
 
@@ -65,6 +54,7 @@ const deleteSaleById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteMultipleSales = catchAsync(async (req: Request, res: Response) => {
+  
   const sales = await SaleServices.deleteMultipleSalesFromDB(req.body.ids);
 
   sendResponse(res, {
@@ -79,7 +69,6 @@ const SaleControllers = {
   addSale,
   getAllSales,
   getSaleById,
-  updateSaleById,
   deleteSaleById,
   deleteMultipleSales,
 };

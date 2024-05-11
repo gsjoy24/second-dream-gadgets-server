@@ -192,29 +192,23 @@ const getAllSalesFromDB = async (query: Record<string, unknown>) => {
     sales,
   };
 };
-const updateSaleIntoDB = async (
-  id: string,
-  payload: Record<string, unknown>,
-) => {
-  const sale = await Sale.isSaleExists(id);
-  if (!sale) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Sale not found');
-  }
-  const result = Sale.findByIdAndUpdate(id, payload, { new: true });
-  return result;
-};
 
 const deleteSaleFromDB = async (id: string) => {
   const sale = await Sale.isSaleExists(id);
   if (!sale) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Sale not found');
+    throw new AppError(httpStatus.NOT_FOUND, 'Sale record not found');
   }
   const result = Sale.findByIdAndDelete(id);
   return result;
 };
 
 const deleteMultipleSalesFromDB = async (ids: string[]) => {
-  const result = Sale.deleteMany({ _id: { $in: ids } });
+  const sales = await Sale.find({ _id: { $in: ids } });
+  if (!sales.length) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Sales not found');
+  }
+
+  const result = Sale.deleteMany({ _id: { $in: ids } }) as any;
   return result;
 };
 
@@ -222,7 +216,6 @@ const SaleServices = {
   addSaleIntoDB,
   getAllSalesFromDB,
   getSaleFromDB,
-  updateSaleIntoDB,
   deleteSaleFromDB,
   deleteMultipleSalesFromDB,
 };
