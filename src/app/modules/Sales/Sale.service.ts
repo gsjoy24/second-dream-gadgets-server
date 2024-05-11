@@ -2,7 +2,6 @@
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../errors/AppError';
-// import Product from '../Product/product.model';
 import Product from '../Product/product.model';
 import User from '../User/user.model';
 import { TSale } from './sale.interface';
@@ -11,7 +10,7 @@ import Sale from './sale.model';
 const addSaleIntoDB = async (payload: TSale, user: JwtPayload) => {
   const userWithCart = await User.findById(user._id)
     .select('cart')
-    .populate('cart.product', '_id product_price quantity');
+    .populate('cart.product', '_id product_name product_price quantity');
 
   if (!userWithCart?.cart.length) {
     throw new AppError(httpStatus.NOT_FOUND, 'No product found in cart');
@@ -29,14 +28,14 @@ const addSaleIntoDB = async (payload: TSale, user: JwtPayload) => {
     );
   }
 
-  const products = userWithCart.cart.map((product: any) => ({
-    product: product.product._id,
-    current_price: product.product?.product_price,
-    quantity: product.quantity,
+  const products = userWithCart.cart.map(({ product, quantity }: any) => ({
+    product_name: product.product_name,
+    price: product?.product_price,
+    quantity,
   }));
 
   const total_amount = products.reduce(
-    (acc, product) => acc + product.current_price * product.quantity,
+    (acc, product) => acc + product.price * product.quantity,
     0,
   );
 
@@ -100,6 +99,99 @@ const getSaleFromDB = async (id: string) => {
   return sale;
 };
 
+const getAllSalesFromDB = async (query: Record<string, unknown>) => {
+  const page = Number(query?.page) || 1;
+  const limit = Number(query?.limit) || 10;
+  const skip = (page - 1) * limit;
+  const queryObject = { ...query };
+  const salePeriod = query?.salePeriod || 'all';
+
+  let startDate = new Date();
+  switch ((salePeriod as string).toLowerCase()) {
+    case 'daily':
+      startDate.setUTCHours(0, 0, 0, 0);
+      break;
+
+    case 'weekly':
+      startDate.setUTCHours(0, 0, 0, 0);
+      startDate.setDate(startDate.getUTCDate() - startDate.getUTCDay());
+      break;
+
+    case 'monthly':
+      startDate = new Date(
+        Date.UTC(
+          startDate.getUTCFullYear(),
+          startDate.getUTCMonth(),
+          1,
+          0,
+          0,
+          0,
+          0,
+        ),
+      );
+      break;
+
+    case 'yearly':
+      startDate = new Date(
+        Date.UTC(startDate.getUTCFullYear(), 0, 1, 0, 0, 0, 0),
+      );
+      break;
+    default:
+      startDate = new Date(0);
+  }
+
+  // format date to ISO string
+  const formattedStartDate = startDate.toISOString().slice(0, -1) + '+00:00';
+
+  //! filter by date
+  const createdAtFilter =
+    salePeriod !== 'all'
+      ? {
+          selling_date: {
+            $gte: formattedStartDate,
+            $lt: new Date().toISOString(),
+          },
+        }
+      : {};
+
+  // remove salePeriod from queryObject
+  delete queryObject.salePeriod;
+  delete queryObject.search;
+
+  //search by name
+  const searchWithName = query?.search
+    ? {
+        customer: { $regex: query?.search, $options: 'i' },
+      }
+    : {};
+
+  const salesWithSearch = Sale.find(searchWithName);
+  const sales = await salesWithSearch
+    .find({
+      ...queryObject,
+      ...createdAtFilter,
+    })
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    .populate('products.product');
+
+  const total = await Sale.countDocuments({
+    ...queryObject,
+    ...createdAtFilter,
+  });
+
+  const meta = {
+    total,
+    page,
+    limit,
+  };
+
+  return {
+    meta,
+    sales,
+  };
+};
 const updateSaleIntoDB = async (
   id: string,
   payload: Record<string, unknown>,
@@ -128,6 +220,7 @@ const deleteMultipleSalesFromDB = async (ids: string[]) => {
 
 const SaleServices = {
   addSaleIntoDB,
+  getAllSalesFromDB,
   getSaleFromDB,
   updateSaleIntoDB,
   deleteSaleFromDB,

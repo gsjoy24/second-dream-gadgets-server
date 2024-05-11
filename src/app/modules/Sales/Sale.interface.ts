@@ -3,7 +3,7 @@ import { Model, Types } from 'mongoose';
 
 export type TSoldProduct = {
   product: string;
-  current_price: number;
+  price: number;
   quantity: number;
 };
 

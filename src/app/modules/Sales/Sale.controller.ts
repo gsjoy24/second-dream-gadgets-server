@@ -19,17 +19,17 @@ const addSale = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// const getAllSales = catchAsync(async (req: Request, res: Response) => {
-//   const { meta, sales } = await SaleServices.getAllSalesFromDB(req.query);
+const getAllSales = catchAsync(async (req: Request, res: Response) => {
+  const { meta, sales } = await SaleServices.getAllSalesFromDB(req.query);
 
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'All sales fetched successfully',
-//     meta,
-//     data: sales,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All sales fetched successfully',
+    meta,
+    data: sales,
+  });
+});
 
 const getSaleById = catchAsync(async (req: Request, res: Response) => {
   const sale = await SaleServices.getSaleFromDB(req.params.id);
@@ -77,7 +77,7 @@ const deleteMultipleSales = catchAsync(async (req: Request, res: Response) => {
 
 const SaleControllers = {
   addSale,
-  // getAllSales,
+  getAllSales,
   getSaleById,
   updateSaleById,
   deleteSaleById,

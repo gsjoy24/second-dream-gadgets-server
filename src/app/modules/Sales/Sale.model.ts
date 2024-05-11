@@ -1,6 +1,29 @@
 import { Schema, model } from 'mongoose';
 import { TSale, TSaleModel } from './sale.interface';
 
+const soldProductSchema = new Schema(
+  {
+    product_name: {
+      type: String,
+      required: [true, 'Product name is required'],
+      trim: true,
+    },
+    price: {
+      type: Number,
+      required: [true, 'Current price is required'],
+      trim: true,
+    },
+    quantity: {
+      type: Number,
+      required: [true, 'Quantity is required'],
+      trim: true,
+    },
+  },
+  {
+    _id: false,
+  },
+);
+
 const SaleSchema = new Schema<TSale, TSaleModel>(
   {
     customer_name: {
@@ -18,28 +41,7 @@ const SaleSchema = new Schema<TSale, TSaleModel>(
       required: [true, 'Sold by is required'],
       trim: true,
     },
-    products: [
-      {
-        product: {
-          type: String,
-          required: [true, 'Product name is required'],
-          trim: true,
-        },
-        current_price: {
-          type: Number,
-          required: [true, 'Current price is required'],
-          trim: true,
-        },
-        quantity: {
-          type: Number,
-          required: [true, 'Quantity is required'],
-          trim: true,
-        },
-      },
-      {
-        _id: false,
-      },
-    ],
+    products: [soldProductSchema],
     total_amount: {
       type: Number,
       required: [true, 'Total amount is required'],
