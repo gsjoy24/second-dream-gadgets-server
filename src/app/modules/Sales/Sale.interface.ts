@@ -1,12 +1,19 @@
 /* eslint-disable no-unused-vars */
 import { Model, Types } from 'mongoose';
 
-export type TSale = {
-  customer: string;
-  product: Types.ObjectId;
+export type TSoldProduct = {
+  product: string;
+  current_price: number;
   quantity: number;
-  total_price: number;
-  date?: Date;
+};
+
+export type TSale = {
+  customer_name: string;
+  contact_number: string;
+  sold_by: Types.ObjectId;
+  products: TSoldProduct[];
+  total_amount: number;
+  selling_date?: Date;
   createdAt?: Date;
 };
 

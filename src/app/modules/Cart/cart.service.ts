@@ -8,15 +8,19 @@ import User from '../User/user.model';
 const getCart = async (user: JwtPayload) => {
   const cart = await User.findOne({ _id: user._id })
     .select('cart')
-    .populate('cart.product', '_id product_name product_price quantity');
+    .populate(
+      'cart.product',
+      '_id product_name product_price product_image quantity',
+    );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const total_price = cart?.cart.reduce((acc: number, item: any) => {
+  const total_amount = cart?.cart.reduce((acc: number, item: any) => {
     return acc + item?.product?.product_price * item.quantity;
   }, 0);
 
   return {
-    total_price,
+    total_amount,
+    items_count: cart?.cart.length,
     cart: cart?.cart,
   };
 };

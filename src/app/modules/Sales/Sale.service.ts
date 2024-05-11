@@ -1,134 +1,95 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../errors/AppError';
+// import Product from '../Product/product.model';
 import Product from '../Product/product.model';
+import User from '../User/user.model';
 import { TSale } from './sale.interface';
 import Sale from './sale.model';
 
-const addSaleIntoDB = async (payload: TSale) => {
-  const product = await Product.isProductExists(payload.product.toString());
-  if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+const addSaleIntoDB = async (payload: TSale, user: JwtPayload) => {
+  const userWithCart = await User.findById(user._id)
+    .select('cart')
+    .populate('cart.product', '_id product_price quantity');
+
+  if (!userWithCart?.cart.length) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No product found in cart');
   }
-  // check if quantity is available
-  if (product.quantity < payload.quantity) {
+
+  // check if the quantity of the product is not more than the available quantity
+  const isProductAvailable = userWithCart.cart.every(
+    (product: any) => product.quantity <= product.product.quantity,
+  );
+
+  if (!isProductAvailable) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Quantity exceeds the available quantity',
+      'Product quantity is more than available quantity',
     );
   }
-  // decrement quantity
-  const decrementQuantity = await Product.findByIdAndUpdate(
-    payload.product,
-    {
-      $inc: { quantity: -payload.quantity },
-    },
-    { new: true },
+
+  const products = userWithCart.cart.map((product: any) => ({
+    product: product.product._id,
+    current_price: product.product?.product_price,
+    quantity: product.quantity,
+  }));
+
+  const total_amount = products.reduce(
+    (acc, product) => acc + product.current_price * product.quantity,
+    0,
   );
-  if (!decrementQuantity) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Quantity not updated');
-  }
 
-  // delete product if quantity is 0
-  if (decrementQuantity.quantity === 0) {
-    await Product.findByIdAndDelete(payload.product);
-  }
+  const session = await Sale.startSession();
+  try {
+    session.startTransaction();
 
-  const newSale = Sale.create(payload);
-  return newSale;
-};
+    //  decrementing the selling quantity of the product on product collection
+    const productIds = userWithCart.cart.map((product: any) => ({
+      soldProductId: product.product._id,
+      decrementQuantity: product.quantity,
+    }));
 
-const getAllSalesFromDB = async (query: Record<string, unknown>) => {
-  const page = Number(query?.page) || 1;
-  const limit = Number(query?.limit) || 10;
-  const skip = (page - 1) * limit;
-  const queryObject = { ...query };
-  const salePeriod = query?.salePeriod || 'all';
-
-  let startDate = new Date();
-  switch ((salePeriod as string).toLowerCase()) {
-    case 'daily':
-      startDate.setUTCHours(0, 0, 0, 0);
-      break;
-
-    case 'weekly':
-      startDate.setUTCHours(0, 0, 0, 0);
-      startDate.setDate(startDate.getUTCDate() - startDate.getUTCDay());
-      break;
-
-    case 'monthly':
-      startDate = new Date(
-        Date.UTC(
-          startDate.getUTCFullYear(),
-          startDate.getUTCMonth(),
-          1,
-          0,
-          0,
-          0,
-          0,
-        ),
-      );
-      break;
-
-    case 'yearly':
-      startDate = new Date(
-        Date.UTC(startDate.getUTCFullYear(), 0, 1, 0, 0, 0, 0),
-      );
-      break;
-    default:
-      startDate = new Date(0);
-  }
-
-  // format date to ISO string
-  const formattedStartDate = startDate.toISOString().slice(0, -1) + '+00:00';
-
-  //! filter by date
-  const createdAtFilter =
-    salePeriod !== 'all'
-      ? {
-          date: {
-            $gte: formattedStartDate,
-            $lt: new Date().toISOString(),
+    await Product.bulkWrite(
+      productIds.map((product: any) => ({
+        updateOne: {
+          filter: { _id: product.soldProductId },
+          update: {
+            $inc: {
+              quantity: -product.decrementQuantity,
+            },
           },
-        }
-      : {};
+        },
+      })),
+      { session },
+    );
 
-  // remove salePeriod from queryObject
-  delete queryObject.salePeriod;
-  delete queryObject.search;
+    const sale = await Sale.create(
+      [
+        {
+          ...payload,
+          products,
+          total_amount,
+          sold_by: user._id,
+        },
+      ],
+      { session },
+    );
 
-  //search by name
-  const searchWithName = query?.search
-    ? {
-        customer: { $regex: query?.search, $options: 'i' },
-      }
-    : {};
+    // empty the cart of the user after the sale
+    await User.findByIdAndUpdate(user._id, { $set: { cart: [] } }, { session });
 
-  const salesWithSearch = Sale.find(searchWithName);
-  const sales = await salesWithSearch
-    .find({
-      ...queryObject,
-      ...createdAtFilter,
-    })
-    .skip(skip)
-    .limit(limit)
-    .sort({ createdAt: -1 })
-    .populate('product');
+    // delete the products from the product collection if the quantity is 0
+    await Product.deleteMany({ quantity: 0 }, { session });
 
-  const total = await Sale.countDocuments({
-    ...queryObject,
-    ...createdAtFilter,
-  });
-
-  const meta = {
-    total,
-    page,
-    limit,
-  };
-
-  return {
-    meta,
-    sales,
-  };
+    await session.commitTransaction();
+    await session.endSession();
+    return sale;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Sale failed');
+  }
 };
 
 const getSaleFromDB = async (id: string) => {
@@ -167,7 +128,6 @@ const deleteMultipleSalesFromDB = async (ids: string[]) => {
 
 const SaleServices = {
   addSaleIntoDB,
-  getAllSalesFromDB,
   getSaleFromDB,
   updateSaleIntoDB,
   deleteSaleFromDB,

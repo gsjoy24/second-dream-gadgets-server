@@ -3,30 +3,51 @@ import { TSale, TSaleModel } from './sale.interface';
 
 const SaleSchema = new Schema<TSale, TSaleModel>(
   {
-    customer: {
+    customer_name: {
       type: String,
       required: [true, 'Customer Name is required'],
       trim: true,
     },
-    product: {
+    contact_number: {
+      type: String,
+      required: [true, 'Contact number is required'],
+      trim: true,
+    },
+    sold_by: {
       type: Schema.Types.ObjectId,
-      required: [true, 'Product ID is required'],
-      ref: 'Product',
+      required: [true, 'Sold by is required'],
       trim: true,
     },
-    quantity: {
+    products: [
+      {
+        product: {
+          type: String,
+          required: [true, 'Product name is required'],
+          trim: true,
+        },
+        current_price: {
+          type: Number,
+          required: [true, 'Current price is required'],
+          trim: true,
+        },
+        quantity: {
+          type: Number,
+          required: [true, 'Quantity is required'],
+          trim: true,
+        },
+      },
+      {
+        _id: false,
+      },
+    ],
+    total_amount: {
       type: Number,
-      required: [true, 'Quantity is required'],
+      required: [true, 'Total amount is required'],
       trim: true,
     },
-    total_price: {
-      type: Number,
-      required: [true, 'Price is required'],
-      trim: true,
-    },
-    date: {
+    selling_date: {
       type: Date,
-      required: [true, 'Date is required'],
+      required: [true, 'Selling date is required'],
       default: Date.now,
     },
   },
@@ -34,10 +55,6 @@ const SaleSchema = new Schema<TSale, TSaleModel>(
     timestamps: true,
   },
 );
-
-SaleSchema.statics.isSaleExists = async function (id: string) {
-  return this.findById(id).populate('product');
-};
 
 const Sale = model<TSale, TSaleModel>('Sale', SaleSchema);
 
