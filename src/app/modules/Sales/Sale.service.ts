@@ -174,7 +174,7 @@ const getAllSalesFromDB = async (query: Record<string, unknown>) => {
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: -1 })
-    .populate('products.product');
+    .populate('sold_by', 'name email');
 
   const total = await Sale.countDocuments({
     ...queryObject,

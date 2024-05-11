@@ -38,8 +38,7 @@ const SaleSchema = new Schema<TSale, TSaleModel>(
     },
     sold_by: {
       type: Schema.Types.ObjectId,
-      required: [true, 'Sold by is required'],
-      trim: true,
+      ref: 'User',
     },
     products: [soldProductSchema],
     total_amount: {
