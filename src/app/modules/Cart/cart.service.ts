@@ -3,7 +3,6 @@ import { JwtPayload } from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import Product from '../Product/product.model';
-import { TCart } from '../User/user.interface';
 import User from '../User/user.model';
 
 const getCart = async (user: JwtPayload) => {
@@ -22,16 +21,33 @@ const getCart = async (user: JwtPayload) => {
   };
 };
 
-const addProductToCart = async (cartData: TCart, user: JwtPayload) => {
+const addProductToCart = async (
+  productId: Types.ObjectId,
+  user: JwtPayload,
+) => {
   // check if the product is exists
-  const isProductExist = await Product.findById(cartData.product);
+  const isProductExist = await Product.findById(productId);
   if (!isProductExist) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
 
+  // check if the product is already in the cart array
+  const isProductInCart = await User.findOne({
+    _id: user._id,
+    cart: {
+      $elemMatch: {
+        product: productId,
+      },
+    },
+  });
+
+  if (isProductInCart) {
+    throw new AppError(httpStatus.CONFLICT, 'Product already in cart');
+  }
+
   await User.findByIdAndUpdate(user._id, {
     $addToSet: {
-      cart: cartData,
+      cart: { product: productId, quantity: 1 },
     },
   });
 

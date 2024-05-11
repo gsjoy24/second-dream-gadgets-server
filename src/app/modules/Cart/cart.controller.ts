@@ -18,7 +18,7 @@ const getCart = catchAsync(async (req: Request, res: Response) => {
 
 const addProductToCart = catchAsync(async (req: Request, res: Response) => {
   const result = await CartServices.addProductToCart(
-    req.body,
+    req.params.productId as unknown as Types.ObjectId,
     req.user as JwtPayload,
   );
   sendResponse(res, {
