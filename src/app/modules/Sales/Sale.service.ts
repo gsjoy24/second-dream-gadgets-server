@@ -161,7 +161,15 @@ const getAllSalesFromDB = async (query: Record<string, unknown>) => {
   //search by name
   const searchWithName = query?.search
     ? {
-        customer: { $regex: query?.search, $options: 'i' },
+        $or: [
+          {
+            'products.product_name': {
+              $regex: query?.search as string,
+              $options: 'i',
+            },
+          },
+          { customer_name: { $regex: query?.search, $options: 'i' } },
+        ],
       }
     : {};
 
