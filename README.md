@@ -40,4 +40,4 @@ the server is running on port 3000
 #### This server is deployed on vercel
 
 - live link ↦ <https://second-dream-server.vercel.app/>
-- client side link ↦ <https://dream-gadget.web.app/>
+- client side link ↦ <https://second-dream-gadgets.web.app/>
