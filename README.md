@@ -9,9 +9,9 @@
 
 NODE_ENV=development
 PORT=3000
-DATABASE_URL=mongodb+srv://admin-gsj:2O0rnkiIrIGr2L7Q@cluster0.nbdk5o7.mongodb.net/gadget-management-2?retryWrites=true&w=majority
+DATABASE_URL=''
 BCRYPT_SALT_ROUND=12
-JWT_ACCESS_TOKEN=4e503701998d6df51775c23276da1fd772a382cdabb7ee1db436b32b94a31924
+JWT_ACCESS_TOKEN=''
 JWT_ACCESS_EXPIRES_IN=7d
 SUPER_ADMIN_EMAIL=superAdmin@gmail.com
 SUPER_ADMIN_PASSWORD=superAdmin0
